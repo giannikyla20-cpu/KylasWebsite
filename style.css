@@ -125,8 +125,8 @@ h3 {
 }
 /* Her raised arm swings back and forth = waving */
 .pixel-girl .wave {
-    transform-box: view-box;
-    transform-origin: 14px 15px; /* pivot at the shoulder */
+    transform-box: fill-box;       /* pivot relative to the arm's own box */
+    transform-origin: 50% 90%;     /* near the shoulder, at the bottom of the arm */
     animation: girl-wave 1.1s ease-in-out infinite;
 }
 @keyframes girl-wave {
