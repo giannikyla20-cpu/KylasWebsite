@@ -104,18 +104,19 @@ h3 {
     font-size: 14px;
 }
 
-/* ----- Pixel girl mascot at the bottom-left of the page ----- */
+/* ----- Pixel girl mascot pinned to the bottom-left corner of the screen ----- */
 .pixel-girl {
-    display: block;
-    width: 104px;
+    position: fixed;      /* pin to the viewport, not the page flow */
+    left: 12px;
+    bottom: 12px;
+    width: 90px;
     height: auto;
-    margin: 8px 0 0 0;    /* sits at the end of the page, against the left */
-    margin-right: auto;   /* keep her on the left edge */
     pointer-events: none; /* purely decorative */
     overflow: visible;    /* let the waving hand swing past the edge */
     image-rendering: pixelated;
     filter: drop-shadow(0 3px 5px rgba(0, 0, 0, 0.35));
     animation: girl-bob 3s ease-in-out infinite;
+    z-index: 10;
 }
 /* Gentle up-and-down idle bob for the whole character */
 @keyframes girl-bob {
