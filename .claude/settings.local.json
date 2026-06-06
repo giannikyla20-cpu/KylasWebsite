@@ -1,7 +1,12 @@
 {
   "permissions": {
     "allow": [
-      "Bash(grep *)"
+      "Bash(grep *)",
+      "Bash(command -v chromium chromium-browser google-chrome google-chrome-stable firefox)",
+      "Bash(command -v node npx)",
+      "Bash(chromium --headless --disable-gpu --hide-scrollbars --window-size=900,700 --screenshot=/tmp/wave_t0.png --virtual-time-budget=100 \"file:///home/kyla/Documents/KylasWebsite/projects.html\")",
+      "Bash(chromium --headless --disable-gpu --hide-scrollbars --window-size=900,700 --screenshot=/tmp/wave_t1.png --virtual-time-budget=650 \"file:///home/kyla/Documents/KylasWebsite/projects.html\")",
+      "Read(//tmp/**)"
     ]
   }
 }
