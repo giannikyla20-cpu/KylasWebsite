@@ -109,7 +109,7 @@ h3 {
     position: fixed;      /* pin to the viewport, not the page flow */
     left: 12px;
     bottom: 12px;
-    width: 90px;
+    width: 129px;        /* wider viewBox includes room for the waving arm */
     height: auto;
     pointer-events: none; /* purely decorative */
     overflow: visible;    /* let the waving hand swing past the edge */
@@ -128,7 +128,7 @@ h3 {
    (see the .wave group in the HTML) for reliable cross-browser pivoting. */
 /* Smaller on phones so she doesn't crowd the text */
 @media (max-width: 600px) {
-    .pixel-girl { width: 74px; }
+    .pixel-girl { width: 106px; }
 }
 /* Respect users who prefer no motion */
 @media (prefers-reduced-motion: reduce) {
