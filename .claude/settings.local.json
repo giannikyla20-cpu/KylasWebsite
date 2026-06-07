@@ -8,7 +8,9 @@
       "Bash(chromium --headless --disable-gpu --hide-scrollbars --window-size=900,700 --screenshot=/tmp/wave_t1.png --virtual-time-budget=650 \"file:///home/kyla/Documents/KylasWebsite/projects.html\")",
       "Read(//tmp/**)",
       "Bash(chromium --headless --disable-gpu --hide-scrollbars --window-size=400,700 --screenshot=/tmp/wave_peak.png --virtual-time-budget=550 \"file:///home/kyla/Documents/KylasWebsite/projects.html\")",
-      "Bash(chromium --headless --disable-gpu --hide-scrollbars --window-size=400,700 --screenshot=/tmp/wave_peak2.png --virtual-time-budget=1650 \"file:///home/kyla/Documents/KylasWebsite/projects.html\")"
+      "Bash(chromium --headless --disable-gpu --hide-scrollbars --window-size=400,700 --screenshot=/tmp/wave_peak2.png --virtual-time-budget=1650 \"file:///home/kyla/Documents/KylasWebsite/projects.html\")",
+      "Bash(git push *)",
+      "Bash(git commit -m 'Add StudyTimer as a regular folder instead of a submodule *)"
     ]
   }
 }
