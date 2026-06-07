@@ -24,18 +24,70 @@
         }
 
         .card {
+            position: relative;
             background: rgba(255, 255, 255, 0.88);
             backdrop-filter: blur(10px);
             border-radius: 28px;
-            padding: 36px 32px 28px;
+            padding: 40px 34px 30px;
             width: 340px;
             box-shadow: 0 12px 40px rgba(233, 100, 150, 0.18);
             text-align: center;
             border: 2.5px solid #ad1457;
+            transition: border-color 0.5s, box-shadow 0.5s;
+        }
+
+        body.break-mode .card {
+            border-color: #1b5e20;
+            box-shadow: 0 12px 40px rgba(56, 142, 60, 0.18);
+        }
+
+        /* ── Dainty dashed inner frame ── */
+        .card::before {
+            content: '';
+            position: absolute;
+            inset: 7px;
+            border: 2px dashed #f48fb1;
+            border-radius: 20px;
+            pointer-events: none;
             transition: border-color 0.5s;
         }
 
-        body.break-mode .card { border-color: #1b5e20; }
+        body.break-mode .card::before { border-color: #80cbc4; }
+
+        /* ── Little flowers in the corners ── */
+        .corner {
+            position: absolute;
+            font-size: 1.55rem;
+            line-height: 1;
+            pointer-events: none;
+            animation: sway 4s ease-in-out infinite;
+        }
+
+        .corner::before { content: '🌸'; }
+        body.break-mode .corner::before { content: '🌼'; }
+
+        .corner.tl { top: -15px; left: -15px; }
+        .corner.tr { top: -15px; right: -15px; animation-delay: 1s; }
+        .corner.bl { bottom: -15px; left: -15px; animation-delay: 2s; }
+        .corner.br { bottom: -15px; right: -15px; animation-delay: 3s; }
+
+        @keyframes sway {
+            0%, 100% { transform: rotate(-12deg); }
+            50%      { transform: rotate(12deg); }
+        }
+
+        /* ── Swishy flourish divider ── */
+        .flourish {
+            font-size: 1rem;
+            letter-spacing: 2px;
+            color: #f06292;
+            margin: -6px 0 18px;
+            transition: color 0.5s;
+        }
+
+        body.break-mode .flourish { color: #66bb6a; }
+
+        .flourish::before { content: '꙳ ⋆ ˚｡⋆ ❀ ⋆｡˚ ⋆ ꙳'; }
 
         .mode-badge {
             display: inline-block;
@@ -191,9 +243,15 @@
 </head>
 <body>
     <div class="card">
+        <span class="corner tl"></span>
+        <span class="corner tr"></span>
+        <span class="corner bl"></span>
+        <span class="corner br"></span>
+
         <div class="mode-badge" id="mode-badge">Study Time</div>
         <h1 id="card-title">Cute Study Timer 🌸</h1>
         <div class="emoji-row" id="emoji-row">📚 ✨ 🍓</div>
+        <div class="flourish"></div>
 
         <div class="ring-wrap">
             <svg class="ring" width="100" height="100" viewBox="0 0 100 100">
