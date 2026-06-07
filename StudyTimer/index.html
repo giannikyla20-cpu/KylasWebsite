@@ -239,6 +239,69 @@
         }
 
         body.break-mode #ring-fill { stroke: #388e3c; }
+
+        /* ── Minimize / expand toggle ── */
+        #btn-mini {
+            position: absolute;
+            top: 10px;
+            right: 12px;
+            width: 28px;
+            height: 28px;
+            padding: 0;
+            font-size: 1rem;
+            line-height: 1;
+            border-radius: 9px;
+            background: #fce4ec;
+            color: #c2185b;
+            z-index: 5;
+        }
+
+        body.break-mode #btn-mini { background: #e8f5e9; color: #2e7d32; }
+
+        /* ── Compact "focus" mode: small floating timer ── */
+        .card.mini {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: auto;
+            padding: 16px 20px 14px;
+            cursor: grab;
+            user-select: none;
+        }
+
+        .card.mini:active { cursor: grabbing; }
+
+        .card.mini::before { inset: 4px; border-radius: 14px; }
+
+        .card.mini .mode-badge,
+        .card.mini h1,
+        .card.mini .emoji-row,
+        .card.mini .flourish,
+        .card.mini .inputs,
+        .card.mini .ring-wrap,
+        .card.mini #btn-reset { display: none; }
+
+        .card.mini #btn-mini { top: 6px; right: 7px; width: 22px; height: 22px; font-size: 0.85rem; }
+
+        .card.mini #timer-display {
+            font-size: 2.1rem;
+            letter-spacing: 2px;
+            margin: 10px 0 12px;
+        }
+
+        .card.mini .buttons { gap: 7px; }
+
+        .card.mini button {
+            padding: 7px 14px;
+            font-size: 0.82rem;
+            border-radius: 11px;
+        }
+
+        .card.mini .corner { font-size: 1rem; }
+        .card.mini .corner.tl { top: -9px; left: -9px; }
+        .card.mini .corner.tr { top: -9px; right: -9px; }
+        .card.mini .corner.bl { bottom: -9px; left: -9px; }
+        .card.mini .corner.br { bottom: -9px; right: -9px; }
     </style>
 </head>
 <body>
@@ -247,6 +310,8 @@
         <span class="corner tr"></span>
         <span class="corner bl"></span>
         <span class="corner br"></span>
+
+        <button id="btn-mini" title="Minimize">–</button>
 
         <div class="mode-badge" id="mode-badge">Study Time</div>
         <h1 id="card-title">Cute Study Timer 🌸</h1>
@@ -292,6 +357,8 @@
         const cardTitle   = document.getElementById('card-title');
         const emojiRow    = document.getElementById('emoji-row');
         const ringFill    = document.getElementById('ring-fill');
+        const btnMini     = document.getElementById('btn-mini');
+        const card        = document.querySelector('.card');
         const CIRCUMF     = 263.9;
 
         let isStudy    = true;
@@ -299,6 +366,39 @@
         let remaining  = 0;
         let total      = 0;
         let intervalId = null;
+
+        // ── Soft chime (gentle bell-like arpeggio via Web Audio) ──
+        let audioCtx = null;
+
+        function chimeNote(ctx, freq, startTime, duration) {
+            // bell tone = a couple of soft sine partials with a slow decay
+            [1, 2.01].forEach((mult, i) => {
+                const osc  = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.type = 'sine';
+                osc.frequency.value = freq * mult;
+
+                const peak = i === 0 ? 0.22 : 0.07;
+                gain.gain.setValueAtTime(0.0001, startTime);
+                gain.gain.exponentialRampToValueAtTime(peak, startTime + 0.02);
+                gain.gain.exponentialRampToValueAtTime(0.0001, startTime + duration);
+
+                osc.connect(gain).connect(ctx.destination);
+                osc.start(startTime);
+                osc.stop(startTime + duration);
+            });
+        }
+
+        function playChime() {
+            try {
+                if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                if (audioCtx.state === 'suspended') audioCtx.resume();
+                const now = audioCtx.currentTime;
+                // soft pentatonic arpeggio: C5 · E5 · G5 · C6
+                const notes = [523.25, 659.25, 783.99, 1046.5];
+                notes.forEach((f, i) => chimeNote(audioCtx, f, now + i * 0.18, 2.4));
+            } catch (e) { /* audio not available */ }
+        }
 
         function fmt(secs) {
             const m = String(Math.floor(secs / 60)).padStart(2, '0');
@@ -342,7 +442,7 @@
                 clearInterval(intervalId);
                 running = false;
                 btnStart.textContent = '▶ Start';
-                new Audio('https://actions.google.com/sounds/v1/alarms/beep_short.ogg').play().catch(() => {});
+                playChime();
                 isStudy = !isStudy;
                 applyMode();
                 loadDuration();
@@ -385,6 +485,42 @@
             loadDuration();
             updateDisplay();
         });
+
+        // ── Minimize / expand the timer into a small floating widget ──
+        btnMini.addEventListener('click', () => {
+            const mini = card.classList.toggle('mini');
+            btnMini.textContent = mini ? '⤢' : '–';
+            btnMini.title       = mini ? 'Expand' : 'Minimize';
+            if (!mini) {
+                // back to centered: clear any dragged position
+                card.style.left = card.style.top = '';
+                card.style.right = card.style.bottom = '';
+            }
+        });
+
+        // ── Drag the mini timer anywhere on screen ──
+        let dragging = false, dragDX = 0, dragDY = 0;
+
+        card.addEventListener('mousedown', (e) => {
+            if (!card.classList.contains('mini')) return;
+            if (e.target.closest('button')) return;   // let buttons work normally
+            dragging = true;
+            const rect = card.getBoundingClientRect();
+            dragDX = e.clientX - rect.left;
+            dragDY = e.clientY - rect.top;
+            card.style.right = card.style.bottom = 'auto';
+            card.style.left  = rect.left + 'px';
+            card.style.top   = rect.top  + 'px';
+            e.preventDefault();
+        });
+
+        window.addEventListener('mousemove', (e) => {
+            if (!dragging) return;
+            card.style.left = (e.clientX - dragDX) + 'px';
+            card.style.top  = (e.clientY - dragDY) + 'px';
+        });
+
+        window.addEventListener('mouseup', () => { dragging = false; });
 
         // Re-sync display when inputs change (only when stopped)
         [studyInput, breakInput].forEach(inp => {
